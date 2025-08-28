@@ -7,11 +7,22 @@ function Items() {
 
   useEffect(() => {
     let active = true;
-
+  
     // Intentional bug: setState called after component unmount if request is slow
-    fetchItems().catch(console.error);
-
-    // Clean‑up to avoid memory leak (candidate should implement)
+    // FIXED the problem by creating an async function inside the useEffect so we have the fetch items
+    // result before mounting.
+    const loadItems = async () => {
+      try {
+        const result = await fetchItems();
+      } catch (error) {
+        if (active) {
+          console.error('Failed to fetch items:', error);
+        }
+      }
+    };
+  
+    loadItems();
+  
     return () => {
       active = false;
     };
